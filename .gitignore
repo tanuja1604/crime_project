@@ -1,0 +1,19 @@
+# Virtual Environment
+crime_env/
+
+# Python
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# Large Files
+crime_model.pkl
+crime data.csv
+cleaned_crime_data1.csv
+
+# VS Code
+.vscode/
+
+# OS Files
+.DS_Store
+Thumbs.db
