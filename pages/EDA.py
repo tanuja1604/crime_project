@@ -1,6 +1,8 @@
+
 import streamlit as st
 import pandas as pd
-import plotly.express as px
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 # -------------------------------------------------------
 # Page Configuration
@@ -10,6 +12,8 @@ st.set_page_config(
     page_icon="📊",
     layout="wide"
 )
+
+sns.set_style("whitegrid")
 
 # -------------------------------------------------------
 # Load Dataset
@@ -62,7 +66,7 @@ if selected_area != "All":
 # -------------------------------------------------------
 st.subheader("Dashboard Overview")
 
-c1,c2,c3,c4 = st.columns(4)
+c1, c2, c3, c4 = st.columns(4)
 
 c1.metric(
     "📁 Total Records",
@@ -81,275 +85,196 @@ c3.metric(
 
 c4.metric(
     "🎯 Model Accuracy",
-    "92%"
+    "96.61%"
 )
 
 st.markdown("---")
 
-# =======================================================
-# Row 1
-# =======================================================
+# -------------------------------------------------------
+# Plot Style
+# -------------------------------------------------------
+sns.set_style("darkgrid")
 
-col1,col2 = st.columns(2)
-
-with col1:
-
-    crime = (
-        filtered_df["crm cd desc"]
-        .value_counts()
-        .head(10)
-        .reset_index()
-    )
-
-    crime.columns = ["Crime Type","Count"]
-
-    fig = px.bar(
-        crime,
-        x="Count",
-        y="Crime Type",
-        orientation="h",
-        color="Count",
-        color_continuous_scale="Blues",
-        text="Count",
-        title="Top 10 Crime Types"
-    )
-
-    fig.update_layout(
-        height=450,
-        coloraxis_showscale=False,
-        template="simple_white"
-    )
-
-    fig.update_traces(
-        textposition="outside"
-    )
-
-    st.plotly_chart(
-        fig,
-        use_container_width=True,
-        config={"displayModeBar":False}
-    )
-
-with col2:
-
-    gender = (
-        filtered_df["vict sex"]
-        .value_counts()
-        .reset_index()
-    )
-
-    gender.columns=["Gender","Count"]
-
-    fig = px.pie(
-        gender,
-        values="Count",
-        names="Gender",
-        hole=0.55,
-        color_discrete_sequence=px.colors.sequential.Blues_r,
-        title="Victim Gender Distribution"
-    )
-
-    fig.update_layout(
-        height=450,
-        template="simple_white"
-    )
-
-    st.plotly_chart(
-        fig,
-        use_container_width=True,
-        config={"displayModeBar":False}
-    )
-
-st.markdown("---")
+plt.rcParams.update({
+    "figure.facecolor": "none",
+    "axes.facecolor": "none",
+    "axes.edgecolor": "white",
+    "axes.labelcolor": "white",
+    "xtick.color": "white",
+    "ytick.color": "white",
+    "text.color": "white",
+    "axes.titlecolor": "white",
+    "grid.color": "gray",
+    "font.size": 10
+})
 
 # =======================================================
-# Row 2
+# 1. Top 10 Crime Types
+# =======================================================
+st.subheader("Top 10 Crime Types")
+
+fig, ax = plt.subplots(figsize=(8,4), facecolor="none")
+
+sns.countplot(
+    y="crm cd desc",
+    data=filtered_df,
+    order=filtered_df["crm cd desc"].value_counts().index[:10],
+    color="#4C78A8",
+    ax=ax
+)
+
+ax.set_title("Top 10 Crime Types", fontsize=14)
+ax.set_xlabel("Count")
+ax.set_ylabel("Crime Type")
+
+# Remove grid
+ax.grid(False)
+
+# Remove white background
+ax.set_facecolor("none")
+fig.patch.set_alpha(0)
+
+sns.despine(left=True, bottom=True)
+
+st.pyplot(fig)
+
+# -------------------------------------------------------
+# Victim Gender Distribution
+# -------------------------------------------------------
+
+st.subheader("Victim Gender Distribution")
+
+gender = filtered_df["vict sex"].value_counts()
+
+fig, ax = plt.subplots(figsize=(5,5))
+
+fig.patch.set_alpha(0)
+ax.set_facecolor("none")
+
+ax.pie(
+    gender,
+    labels=gender.index,
+    autopct="%1.1f%%",
+    startangle=90,
+    textprops={"fontsize":10},
+    wedgeprops=dict(edgecolor="white", linewidth=2)
+)
+
+ax.set_title(
+    "Victim Gender Distribution",
+    fontsize=14,
+    fontweight="bold"
+)
+
+left, center, right = st.columns([1,2,1])
+
+with center:
+    st.pyplot(fig)
+
+plt.close(fig)
+# =======================================================
+# 3. Top 10 Crime Areas
 # =======================================================
 
-col1,col2 = st.columns(2)
+st.subheader("Top 10 Crime Areas")
 
-with col1:
+fig, ax = plt.subplots(figsize=(8,4), facecolor="none")
 
-    area = (
-        filtered_df["area name"]
-        .value_counts()
-        .head(10)
-        .reset_index()
-    )
+sns.countplot(
+    y="area name",
+    data=filtered_df,
+    order=filtered_df["area name"].value_counts().index[:10],
+    color="#4C78A8",
+    ax=ax
+)
 
-    area.columns=["Area","Crime Count"]
+ax.set_title("Top 10 Crime Areas", fontsize=14)
+ax.set_xlabel("Count")
+ax.set_ylabel("Area")
 
-    fig = px.bar(
-        area,
-        x="Crime Count",
-        y="Area",
-        orientation="h",
-        text="Crime Count",
-        color="Crime Count",
-        color_continuous_scale="Blues",
-        title="Top 10 Crime Areas"
-    )
+ax.grid(False)
 
-    fig.update_layout(
-        height=450,
-        template="simple_white",
-        coloraxis_showscale=False
-    )
+ax.set_facecolor("none")
+fig.patch.set_alpha(0)
 
-    fig.update_traces(
-        textposition="outside"
-    )
+sns.despine(left=True, bottom=True)
 
-    st.plotly_chart(
-        fig,
-        use_container_width=True,
-        config={"displayModeBar":False}
-    )
-
-with col2:
-
-    fig = px.histogram(
-        filtered_df,
-        x="vict age",
-        nbins=25,
-        color_discrete_sequence=["#2563EB"],
-        title="Victim Age Distribution"
-    )
-
-    fig.update_layout(
-        height=450,
-        template="simple_white"
-    )
-
-    st.plotly_chart(
-        fig,
-        use_container_width=True,
-        config={"displayModeBar":False}
-    )
-
-st.markdown("---")
-# =======================================================
-# Row 3
-# =======================================================
-
-col1, col2 = st.columns(2)
-
-with col1:
-
-    weapon = (
-        filtered_df["weapon desc"]
-        .value_counts()
-        .head(10)
-        .reset_index()
-    )
-
-    weapon.columns = ["Weapon", "Count"]
-
-    fig = px.bar(
-        weapon,
-        x="Count",
-        y="Weapon",
-        orientation="h",
-        text="Count",
-        color="Count",
-        color_continuous_scale="Blues",
-        title="Top 10 Weapons Used"
-    )
-
-    fig.update_layout(
-        height=450,
-        template="simple_white",
-        coloraxis_showscale=False,
-        yaxis_title="",
-        xaxis_title="Crime Count"
-    )
-
-    fig.update_traces(textposition="outside")
-
-    st.plotly_chart(
-        fig,
-        use_container_width=True,
-        config={"displayModeBar": False}
-    )
-
-with col2:
-
-    hour = (
-        filtered_df["hour"]
-        .value_counts()
-        .sort_index()
-        .reset_index()
-    )
-
-    hour.columns = ["Hour", "Crime Count"]
-
-    fig = px.line(
-        hour,
-        x="Hour",
-        y="Crime Count",
-        markers=True,
-        title="Crime Distribution by Hour"
-    )
-
-    fig.update_traces(
-        line=dict(color="#2563EB", width=4),
-        marker=dict(size=8)
-    )
-
-    fig.update_layout(
-        height=450,
-        template="simple_white",
-        xaxis_title="Hour of Day",
-        yaxis_title="Crime Count"
-    )
-
-    st.plotly_chart(
-        fig,
-        use_container_width=True,
-        config={"displayModeBar": False}
-    )
-
-st.markdown("---")
+st.pyplot(fig)
 
 # =======================================================
-# Correlation Heatmap
+# 4. Victim Age Distribution
 # =======================================================
 
-st.subheader("🔥 Correlation Heatmap")
+st.subheader("Victim Age Distribution")
+
+fig, ax = plt.subplots(figsize=(8,4), facecolor="none")
+
+sns.histplot(
+    filtered_df["vict age"],
+    bins=25,
+    color="#4C78A8",
+    ax=ax
+)
+
+ax.set_title("Victim Age Distribution", fontsize=14)
+ax.set_xlabel("Victim Age")
+ax.set_ylabel("Frequency")
+
+ax.grid(False)
+
+ax.set_facecolor("none")
+fig.patch.set_alpha(0)
+
+sns.despine(left=True, bottom=True)
+
+st.pyplot(fig)
+# =======================================================
+# 5. Correlation Heatmap
+# =======================================================
+
+st.subheader("Correlation Heatmap")
 
 corr_columns = [
-    "vict age",
-    "hour",
-    "month",
-    "year",
+    "dr_no",
     "area",
+    "rpt dist no",
+    "part 1-2",
     "crm cd",
+    "vict age",
+    "premis cd",
+    "weapon used cd",
     "lat",
-    "lon"
+    "lon",
+    "year",
+    "month",
+    "weekday",
+    "hour",
+    "is_weekend",
+    "area_crime_count"
 ]
 
 corr = filtered_df[corr_columns].corr()
 
-fig = px.imshow(
+fig, ax = plt.subplots(figsize=(9,6), facecolor="none")
+
+sns.heatmap(
     corr,
-    text_auto=".2f",
-    color_continuous_scale="Blues",
-    aspect="auto",
-    title="Correlation Between Important Features"
+    annot=True,
+    fmt=".2f",
+    cmap="viridis",
+    linewidths=0.3,
+    square=True,
+    cbar=True,
+    annot_kws={"size":8},
+    ax=ax
 )
 
-fig.update_layout(
-    height=650,
-    template="simple_white"
-)
+ax.set_title("Correlation Heatmap", fontsize=14)
 
-st.plotly_chart(
-    fig,
-    use_container_width=True,
-    config={"displayModeBar": False}
-)
+ax.set_facecolor("none")
+fig.patch.set_alpha(0)
 
-st.markdown("---")
+st.pyplot(fig)
 
 # =======================================================
 # Dataset Preview
@@ -369,12 +294,57 @@ st.markdown("---")
 # Statistical Summary
 # =======================================================
 
-with st.expander("📈 View Statistical Summary"):
+st.subheader("📈 Statistical Summary")
 
-    st.dataframe(
-        filtered_df.describe(),
-        use_container_width=True
-    )
+st.dataframe(
+    filtered_df.describe(),
+    use_container_width=True
+)
+
+st.markdown("---")
+
+# =======================================================
+# Missing Values
+# =======================================================
+
+st.subheader("🧹 Missing Values")
+
+missing = filtered_df.isnull().sum()
+
+missing = missing[missing > 0]
+
+if len(missing) == 0:
+    st.success("✅ No Missing Values Found")
+else:
+    st.dataframe(missing)
+
+st.markdown("---")
+
+# =======================================================
+# Dataset Information
+# =======================================================
+
+st.subheader("📌 Dataset Information")
+
+c1, c2 = st.columns(2)
+
+with c1:
+    st.info(f"""
+Rows : {filtered_df.shape[0]}
+
+Columns : {filtered_df.shape[1]}
+
+Duplicate Records : {filtered_df.duplicated().sum()}
+""")
+
+with c2:
+    st.info(f"""
+Unique Crime Types : {filtered_df['crm cd desc'].nunique()}
+
+Unique Areas : {filtered_df['area name'].nunique()}
+
+Year Range : {filtered_df['year'].min()} - {filtered_df['year'].max()}
+""")
 
 st.markdown("---")
 

@@ -12,9 +12,10 @@ st.title("📈 Model Performance Dashboard")
 st.markdown("Performance evaluation of the trained **Random Forest Classifier**.")
 st.markdown("---")
 
-# -----------------------------
+# ======================================================
 # Model Information
-# -----------------------------
+# ======================================================
+
 st.subheader("🤖 Model Information")
 
 col1, col2 = st.columns(2)
@@ -25,47 +26,63 @@ with col1:
 
 **Problem Type:** Multi-Class Classification
 
-**Target Variable:** Crime Category (Crime Code Description)
+**Target Variable:** Crime Category (35 Most Frequent Crime Types)
+
+**Number of Classes:** 35
 """)
 
 with col2:
     st.info("""
 **Dataset:** Los Angeles Crime Dataset
 
-**Training Algorithm:** Ensemble Learning
+**Algorithm:** Ensemble Learning
 
-**Framework:** Scikit-Learn
+**Library:** Scikit-Learn
+
+**Train-Test Split:** 80% Train | 20% Test
 """)
 
 st.markdown("---")
 
-# -----------------------------
+# ======================================================
 # Performance Metrics
-# -----------------------------
-accuracy = 92.87
-precision = 92.49
-recall = 92.87
-f1 = 91.65
+# ======================================================
+
+accuracy = 96.61
+precision = 96.65
+recall = 96.61
+f1 = 96.34
 
 st.subheader("📊 Performance Metrics")
 
 c1, c2, c3, c4 = st.columns(4)
 
-c1.metric("Accuracy", f"{accuracy}%")
-c2.metric("Precision", f"{precision}%")
-c3.metric("Recall", f"{recall}%")
-c4.metric("F1 Score", f"{f1}%")
+c1.metric("Accuracy", f"{accuracy:.2f}%")
+c2.metric("Precision", f"{precision:.2f}%")
+c3.metric("Recall", f"{recall:.2f}%")
+c4.metric("F1 Score", f"{f1:.2f}%")
 
 st.markdown("---")
 
-# -----------------------------
+# ======================================================
 # Performance Comparison Chart
-# -----------------------------
+# ======================================================
+
 st.subheader("📉 Performance Comparison")
 
 metric_df = pd.DataFrame({
-    "Metric": ["Accuracy", "Precision", "Recall", "F1 Score"],
-    "Score": [accuracy, precision, recall, f1]
+    "Metric": [
+        "Accuracy",
+        "Precision",
+        "Recall",
+        "F1 Score"
+    ],
+    "Score": [
+        accuracy,
+        precision,
+        recall,
+        f1
+    ]
 })
 
 fig = px.bar(
@@ -79,51 +96,100 @@ fig = px.bar(
 )
 
 fig.update_traces(
-    texttemplate='%{text:.2f}%',
-    textposition='outside'
+    texttemplate="%{text:.2f}%",
+    textposition="outside"
 )
 
 fig.update_layout(
     template="simple_white",
     yaxis_title="Percentage (%)",
     xaxis_title="",
-    coloraxis_showscale=False
+    coloraxis_showscale=False,
+    yaxis=dict(range=[90, 100])
 )
 
 st.plotly_chart(fig, use_container_width=True)
 
 st.markdown("---")
 
-# -----------------------------
+# ======================================================
+# Evaluation Summary Table
+# ======================================================
+
+st.subheader("📋 Evaluation Summary")
+
+table = pd.DataFrame({
+    "Metric": [
+        "Accuracy",
+        "Precision",
+        "Recall",
+        "F1 Score"
+    ],
+    "Value (%)": [
+        accuracy,
+        precision,
+        recall,
+        f1
+    ]
+})
+
+st.dataframe(table, use_container_width=True)
+
+st.markdown("---")
+
+# ======================================================
 # Model Summary
-# -----------------------------
+# ======================================================
+
 st.subheader("📝 Model Summary")
 
 st.success(f"""
-✅ The **Random Forest Classifier** achieved an overall **Accuracy of {accuracy:.2f}%**.
+The **Random Forest Classifier** achieved excellent performance on the crime dataset.
 
-• **Accuracy:** {accuracy:.2f}%
+### Performance
 
-• **Precision:** {precision:.2f}%
+- **Accuracy:** {accuracy:.2f}%
+- **Precision:** {precision:.2f}%
+- **Recall:** {recall:.2f}%
+- **F1 Score:** {f1:.2f}%
 
-• **Recall:** {recall:.2f}%
-
-• **F1 Score:** {f1:.2f}%
-
-The model demonstrates excellent predictive performance and is suitable for
-classifying crime categories with high reliability.
+The model predicts the **35 most frequent crime categories** and demonstrates strong predictive performance on unseen test data.
 """)
 
 st.markdown("---")
 
-# -----------------------------
-# Conclusion
-# -----------------------------
-st.subheader("📌 Conclusion")
+# ======================================================
+# Why Random Forest?
+# ======================================================
+
+st.subheader("✅ Why Random Forest?")
 
 st.write("""
-The Random Forest Classifier successfully predicts crime categories using historical
-crime data. The model achieved an accuracy of **92.87%**, indicating strong overall
-performance. The high Precision, Recall, and F1 Score show that the model provides
-balanced and reliable predictions, making it suitable for crime prediction and analysis.
+- High prediction accuracy.
+- Handles large datasets efficiently.
+- Reduces overfitting by combining multiple Decision Trees.
+- Works well with both numerical and categorical features.
+- Robust to noisy data.
+- Provides stable and reliable predictions.
+""")
+
+st.markdown("---")
+
+# ======================================================
+# Conclusion
+# ======================================================
+
+st.subheader("📌 Conclusion")
+
+st.write(f"""
+The Random Forest Classifier was trained using the **Los Angeles Crime Dataset** to predict the **35 most frequent crime categories**.
+
+The model achieved:
+
+- **Accuracy:** {accuracy:.2f}%
+- **Precision:** {precision:.2f}%
+- **Recall:** {recall:.2f}%
+- **F1 Score:** {f1:.2f}%
+
+These results indicate that the model generalizes well to unseen data and is suitable for crime category prediction and crime pattern analysis.
 """)

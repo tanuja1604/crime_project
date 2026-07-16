@@ -39,7 +39,7 @@ with col2:
 
 ### 📊 Model Performance
 
-- ✅ Accuracy : **92%**
+- ✅ Accuracy : **96%**
 - 📌 Classification Problem
 - 📂 Trained on Historical Crime Dataset
     """)

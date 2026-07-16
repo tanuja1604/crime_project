@@ -129,7 +129,7 @@ This project uses a **Random Forest Machine Learning model** trained on crime re
 
 **Algorithm Used:** Random Forest Classifier
 
-**Model Accuracy:** **92%**
+**Model Accuracy:** **96%**
 
 Navigate through the sidebar to explore all project sections.
 """)
